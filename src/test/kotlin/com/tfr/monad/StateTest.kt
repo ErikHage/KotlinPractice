@@ -6,6 +6,16 @@ class StringToInt: Transformation<String, Int> {
     }
 }
 
+object LengthValidation: Validation<String> {
+    override fun validate(input: String): Boolean {
+        return input.length < 5
+    }
+}
+
+fun validateLength(input: String): Boolean {
+    return input.length < 5
+}
+
 fun stringToState(s: String): State<String> {
     return State(s)
 }
@@ -23,6 +33,8 @@ fun main(args: Array<String>) {
             .flatMap { stringToState(it) }
             .map { it.substring(2) }
             .validate { it == "ring" }
+            .validate { validateLength(it) } // using a function
+            .validate { (LengthValidation::validate)(it) }  // using a member function
 
     println(someState.value)
 
