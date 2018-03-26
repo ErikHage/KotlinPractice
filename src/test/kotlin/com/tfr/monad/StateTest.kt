@@ -1,14 +1,22 @@
 package com.tfr.monad
 
 class StringToInt: Transformation<String, Int> {
+    override val name: String
+        get() = this.javaClass.name
+
     override fun execute(input: String): Int {
         return input.toInt()
     }
 }
 
-object LengthValidation: Validation<String> {
-    override fun validate(input: String): Boolean {
-        return input.length < 5
+class LengthValidation: Validation<String> {
+    override val name: String
+        get() = this.javaClass.name
+
+    override fun assert(input: String) {
+        if(input.length < 5) {
+            throw Validation.AssertionException("Expected less than 5 but was " + input.length)
+        }
     }
 }
 
@@ -33,8 +41,8 @@ fun main(args: Array<String>) {
             .flatMap { stringToState(it) }
             .map { it.substring(2) }
             .validate { it == "ring" }
-            .validate { validateLength(it) } // using a function
-            .validate { (LengthValidation::validate)(it) }  // using a member function
+            .validate { validateLength(it) }
+            .validate(LengthValidation())
 
     println(someState.value)
 
